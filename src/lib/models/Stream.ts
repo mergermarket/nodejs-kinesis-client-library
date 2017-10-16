@@ -1,13 +1,12 @@
-import {Kinesis} from 'aws-sdk'
 import {auto, doUntil} from 'async'
 
 export class Stream {
   private name: string
-  private kinesis: Kinesis
+  private streamProvider
 
-  constructor(name: string, kinesis: Kinesis) {
+  constructor(name: string, streamProvider) {
     this.name = name
-    this.kinesis = kinesis
+    this.streamProvider = streamProvider
   }
 
   public exists(callback) {
@@ -91,6 +90,6 @@ export class Stream {
   }
 
   private describe(callback) {
-    this.kinesis.describeStream({ StreamName: this.name }, callback)
+    this.streamProvider.describeStream({ StreamName: this.name }, callback)
   }
 }

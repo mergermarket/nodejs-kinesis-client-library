@@ -5,7 +5,7 @@ import {format as formatUrl} from 'url'
 
 import {without, find} from 'underscore'
 import {auto, parallel, each, forever} from 'async'
-import {ClientConfig, Kinesis, kinesis} from 'aws-sdk'
+import {ClientConfig, kinesis} from 'aws-sdk'
 import {Logger, createLogger} from 'bunyan'
 import {Queries} from 'vogels'
 
@@ -14,8 +14,9 @@ import config from './lib/config'
 import {listShards} from './lib/aws/kinesis'
 import {Lease} from './lib/models/Lease'
 import {Cluster, Capacity as ClusterCapacity} from './lib/models/Cluster'
-import {Stream} from './lib/models/Stream'
 import {create as createServer} from './lib/server'
+import streamProvider from './lib/stream-providers/kinesis-stream-provider'
+import {Stream} from './lib/models/Stream'
 
 
 interface ClusterWorkerWithOpts extends Worker {
@@ -49,13 +50,13 @@ export class ConsumerCluster extends EventEmitter {
   public cluster: Cluster
   private opts: ConsumerClusterOpts
   private logger: Logger
-  private kinesis: Kinesis
   private isShuttingDownFromError = false
   private externalNetwork = {}
   private consumers = {}
   private consumerIds = []
   private lastGarbageCollectedAt = Date.now()
   private endpoints: AWSEndpoints
+  private streamProvider: any
 
   constructor(pathToConsumer: string, opts: ConsumerClusterOpts) {
     super()
@@ -76,7 +77,9 @@ export class ConsumerCluster extends EventEmitter {
       dynamo: this.getDynamoEndpoint(),
     }
 
-    this.kinesis = createKinesisClient(this.opts.awsConfig, this.endpoints.kinesis)
+    const kinesis = createKinesisClient(this.opts.awsConfig, this.endpoints.kinesis)
+    this.streamProvider = streamProvider(kinesis, this.opts.streamName)
+
     this.cluster = new Cluster(this.opts.tableName, this.opts.awsConfig, this.endpoints.dynamo)
     this.init()
   }
@@ -104,7 +107,7 @@ export class ConsumerCluster extends EventEmitter {
 
       createStream: done => {
         const streamName = this.opts.streamName
-        const streamModel = new Stream(streamName, this.kinesis)
+        const streamModel = new Stream(streamName, this.streamProvider)
 
         streamModel.exists((err, exists) => {
           if (err) {
@@ -115,7 +118,7 @@ export class ConsumerCluster extends EventEmitter {
             return done()
           }
 
-          this.kinesis.createStream({ StreamName: streamName, ShardCount: 1 }, err => {
+          this.streamProvider.createStream({ StreamName: streamName, ShardCount: 1 }, err => {
             if (err) {
               return done(err)
             }
@@ -253,7 +256,7 @@ export class ConsumerCluster extends EventEmitter {
 
     parallel({
       allShardIds: done => {
-        listShards(this.kinesis, this.opts.streamName, (err, shards) => {
+        listShards(this.streamProvider, this.opts.streamName, (err, shards) => {
           if (err) {
             return done(err)
           }

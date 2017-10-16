@@ -1,11 +1,11 @@
 import {doUntil} from 'async'
-import {Kinesis, kinesis} from 'aws-sdk'
+import {kinesis} from 'aws-sdk'
 
 export interface ListShardsCallback {
   (err: any, data?: kinesis.Shard[]): void
 }
 
-export const listShards = (client: Kinesis, stream: string, callback: ListShardsCallback) => {
+export const listShards = (streamProvider, stream: string, callback: ListShardsCallback) => {
   let shards = []
   let foundAllShards = false
   var startShardId
@@ -16,7 +16,7 @@ export const listShards = (client: Kinesis, stream: string, callback: ListShards
       ExclusiveStartShardId: startShardId,
     }
 
-    client.describeStream(params, (err, data) => {
+    streamProvider.describeStream(params, (err, data) => {
       if (err) {
         return done(err)
       }

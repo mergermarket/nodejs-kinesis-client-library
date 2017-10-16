@@ -6,6 +6,7 @@ import {pluck} from 'underscore'
 import {createKinesisClient} from './lib/aws/factory'
 import config from './lib/config'
 import {Lease} from './lib/models/Lease'
+import streamProvider from './lib/stream-providers/kinesis-stream-provider'
 
 
 interface AbstractConsumerOpts {
@@ -53,6 +54,7 @@ export class AbstractConsumer {
   private hasStartedExit = false
   private timeBetweenReads: number
   private throughputErrorDelay: number
+  private streamProvider
 
   // Called before record processing starts. This method may be implemented by the child.
   // If it is implemented, the callback must be called for processing to begin.
@@ -88,6 +90,7 @@ export class AbstractConsumer {
     }
 
     this.kinesis = createKinesisClient(this.opts.awsConfig, this.opts.kinesisEndpoint)
+    this.streamProvider = streamProvider(this.kinesis, opts.streamName)
 
     process.on('message', msg => {
       if (msg === config.shutdownMessage) {
@@ -210,7 +213,7 @@ export class AbstractConsumer {
       getRecordsParams = { ShardIterator: this.nextShardIterator, Limit: this.opts.numRecords }
     }
 
-    this.kinesis.getRecords(getRecordsParams, (err, data) => {
+    this.streamProvider.getRecords(getRecordsParams, (err, data) => {
       // Handle known errors
       if (err && err.code === 'ExpiredIteratorException') {
         this.log('Shard iterator expired, updating before next getRecords call')
@@ -301,7 +304,7 @@ export class AbstractConsumer {
       StartingSequenceNumber: sequenceNumber,
     }
 
-    this.kinesis.getShardIterator(params, (e, data) => {
+    this.streamProvider.getShardIterator(params, (e, data) => {
       if (e) {
         return callback(e)
       }
