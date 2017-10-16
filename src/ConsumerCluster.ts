@@ -4,19 +4,18 @@ import {join} from 'path'
 import {format as formatUrl} from 'url'
 
 import {without, find} from 'underscore'
-import {auto, parallel, each, forever} from 'async'
+import {auto, parallel, each, forever, doUntil} from 'async'
 import {Config, Kinesis} from 'aws-sdk'
 import {Logger, createLogger} from 'bunyan'
 import {Queries} from 'vogels'
 
 import {createKinesisClient} from './lib/aws/factory'
 import config from './lib/config'
-import {listShards} from './lib/aws/kinesis'
 import {Lease} from './lib/models/Lease'
 import {Cluster, Capacity as ClusterCapacity} from './lib/models/Cluster'
 import {create as createServer} from './lib/server'
 import streamProvider from './lib/stream-providers/kinesis-stream-provider'
-import {ShardList} from './lib/stream-providers/stream-provider'
+import {ShardList, DescribeStreamData} from './lib/stream-providers/stream-provider'
 import {Stream} from './lib/models/Stream'
 
 
@@ -257,14 +256,46 @@ export class ConsumerCluster extends EventEmitter {
 
     parallel({
       allShardIds: done => {
-        listShards(this.streamProvider, this.opts.streamName, (err, shards) => {
-          if (err) {
-            return done(err)
-          }
+        // listShards(this.streamProvider, this.opts.streamName, (err, shards) => {
+        //   if (err) {
+        //     return done(err)
+        //   }
 
-          _asyncResults.shards = shards
-          done()
-        })
+        //   _asyncResults.shards = shards
+        //   done()
+        // })
+
+        // (streamProvider, stream: string, callback: ListShardsCallback) => {
+          let shards = []
+          let foundAllShards = false
+          var startShardId
+          const next = done => {
+            const params = {
+              StreamName: this.opts.streamName,
+              ExclusiveStartShardId: startShardId,
+            }
+            this.streamProvider.describeStream(params, (err, data: DescribeStreamData) => {
+              if (err) {
+                return done(err)
+              }
+              if (!data.StreamDescription.HasMoreShards) {
+                foundAllShards = true
+              }
+              const lastShard = data.StreamDescription.Shards[data.StreamDescription.Shards.length - 1]
+              startShardId = lastShard.ShardId
+              shards = shards.concat(data.StreamDescription.Shards)
+              done()
+            })
+          }
+          const test = () => !!foundAllShards
+          const finish = err => {
+            if (err) {
+              return done(err)
+            }
+            _asyncResults.shards = shards
+            done()
+          }
+        doUntil(next, test, finish)
       },
       leases: done => {
         const tableName = this.opts.tableName
