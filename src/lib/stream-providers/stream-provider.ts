@@ -1,4 +1,4 @@
-import { Kinesis, AWSError } from 'aws-sdk'
+import { AWSError } from 'aws-sdk'
 
 export interface CreateStreamParams {
   StreamName: string,
