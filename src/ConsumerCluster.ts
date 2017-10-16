@@ -5,7 +5,7 @@ import {format as formatUrl} from 'url'
 
 import {without, find} from 'underscore'
 import {auto, parallel, each, forever} from 'async'
-import {ClientConfig, kinesis} from 'aws-sdk'
+import {Config, Kinesis} from 'aws-sdk'
 import {Logger, createLogger} from 'bunyan'
 import {Queries} from 'vogels'
 
@@ -31,7 +31,7 @@ interface AWSEndpoints {
 export interface ConsumerClusterOpts {
   streamName: string
   tableName: string
-  awsConfig: ClientConfig
+  awsConfig: Config
   dynamoEndpoint?: string
   localDynamo: Boolean
   kinesisEndpoint?: string
@@ -250,7 +250,7 @@ export class ConsumerCluster extends EventEmitter {
   private fetchAvailableShard() {
     // Hack around typescript
     var _asyncResults = <{
-      shards: kinesis.Shard[];
+      shards: Kinesis.Shard[];
       leases: Queries.Query.Result;
     }>{}
 

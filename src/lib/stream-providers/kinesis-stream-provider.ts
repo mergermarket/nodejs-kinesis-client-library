@@ -1,7 +1,7 @@
-import {Kinesis, kinesis} from 'aws-sdk'
+import {Kinesis} from 'aws-sdk'
 
 export interface ListShardsCallback {
-  (err: any, data?: kinesis.Shard[]): void
+  (err: any, data?: Kinesis.Shard[]): void
 }
 
 export default function createKinesisStreamProvider(client: Kinesis, stream) {

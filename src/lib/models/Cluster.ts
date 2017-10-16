@@ -3,7 +3,7 @@ import {hostname} from 'os'
 import {each, doUntil} from 'async'
 import {define, Model, Queries} from 'vogels'
 
-import {ClientConfig, DynamoDB} from 'aws-sdk'
+import {Config, DynamoDB} from 'aws-sdk'
 import {createDynamoClient} from '../aws/factory'
 
 const createModel = (tableName: string, dynamodb: DynamoDB) => {
@@ -29,7 +29,7 @@ export class Cluster {
   public id: string
   public Cluster: Model
 
-  public constructor(tableName: string, conf: ClientConfig, dynamoEndpoint?: string) {
+  public constructor(tableName: string, conf: Config, dynamoEndpoint?: string) {
     this.id = [hostname(), process.pid, Date.now()].join('@')
 
     const dynamodb = createDynamoClient(conf, dynamoEndpoint)
@@ -73,7 +73,7 @@ export class Cluster {
       })
   }
 
-  public static createTable(name: string, conf: ClientConfig, capacity: Capacity,
+  public static createTable(name: string, conf: Config, capacity: Capacity,
     dynamoEndpoint: string, callback: (e: any) => void
   ) {
     const dynamodb = createDynamoClient(conf, dynamoEndpoint)
@@ -103,7 +103,7 @@ export class Cluster {
     })
   }
 
-  public static tableExists(name: string, conf: ClientConfig, dynamoEndpoint: string,
+  public static tableExists(name: string, conf: Config, dynamoEndpoint: string,
     callback: (err: any, data?: Boolean) => void) {
     const dynamodb = createDynamoClient(conf, dynamoEndpoint)
 

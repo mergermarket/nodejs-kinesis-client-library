@@ -1,5 +1,5 @@
 import {series, forever} from 'async'
-import {ClientConfig, Kinesis, kinesis} from 'aws-sdk'
+import {Config, Kinesis} from 'aws-sdk'
 import {Logger, createLogger} from 'bunyan'
 import {pluck} from 'underscore'
 
@@ -14,7 +14,7 @@ interface AbstractConsumerOpts {
   shardId: string
   leaseCounter?: number
   tableName: string
-  awsConfig: ClientConfig
+  awsConfig: Config
   startingIteratorType?: string
   dynamoEndpoint?: string
   kinesisEndpoint?: string
@@ -28,8 +28,8 @@ export interface ProcessRecordsCallback {
 }
 
 export interface ConsumerExtension {
-  processResponse?: (request: kinesis.GetRecordsResult, callback: ProcessRecordsCallback) => void
-  processRecords?: (records: kinesis.Record[], callback: ProcessRecordsCallback) => void
+  processResponse?: (request: Kinesis.GetRecordsOutput, callback: ProcessRecordsCallback) => void
+  processRecords?: (records: Kinesis.Record[], callback: ProcessRecordsCallback) => void
   initialize?: (callback: (err?: any) => void) => void
   shutdown?: (callback: (err?: any) => void) => void
 }
@@ -64,12 +64,12 @@ export class AbstractConsumer {
   }
 
   // Process a batch of records. This method, or processResponse, must be implemented by the child.
-  public processRecords(records: kinesis.Record[], callback: ProcessRecordsCallback) {
+  public processRecords(records: Kinesis.Record[], callback: ProcessRecordsCallback) {
     throw new Error('processRecords must be defined by the consumer class')
   }
 
   // Process raw kinesis response.  Override it to get access to the MillisBehindLatest field.
-  public processResponse(response: kinesis.GetRecordsResult, callback: ProcessRecordsCallback) {
+  public processResponse(response: Kinesis.GetRecordsOutput, callback: ProcessRecordsCallback) {
     this.processRecords(response.Records, callback)
   }
 
@@ -208,7 +208,7 @@ export class AbstractConsumer {
 
   // Get records from the stream and wait for them to be processed.
   private getRecords(callback) {
-    let getRecordsParams = <kinesis.GetRecordsRequest>{ ShardIterator: this.nextShardIterator }
+    let getRecordsParams = <Kinesis.GetRecordsInput>{ ShardIterator: this.nextShardIterator }
     if (this.opts.numRecords && this.opts.numRecords > 0) {
       getRecordsParams = { ShardIterator: this.nextShardIterator, Limit: this.opts.numRecords }
     }

@@ -1,4 +1,4 @@
-import {ClientConfig, DynamoDB} from 'aws-sdk'
+import {Config, DynamoDB} from 'aws-sdk'
 import {define, Model, Queries} from 'vogels'
 import {extend} from 'underscore'
 
@@ -29,7 +29,7 @@ export class Lease {
   private checkpointedSequence: string
   private static DB_TYPE = 'lease'
 
-  constructor(shardId: string, counter: number, table: string, conf: ClientConfig, dynamoEndpoint: string) {
+  constructor(shardId: string, counter: number, table: string, conf: Config, dynamoEndpoint: string) {
     const dynamodb = createDynamoClient(conf, dynamoEndpoint)
 
     this.Lease = createModel(table, dynamodb)
@@ -90,7 +90,7 @@ export class Lease {
     this.update({ isFinished: true }, callback)
   }
 
-  public static fetchAll(tableName: string, conf: ClientConfig, dynamoEndpoint: string,
+  public static fetchAll(tableName: string, conf: Config, dynamoEndpoint: string,
     callback: (err: any, data: Queries.Query.Result) => void
   ) {
     const dynamodb = createDynamoClient(conf, dynamoEndpoint)

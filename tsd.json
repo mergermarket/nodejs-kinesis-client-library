@@ -5,9 +5,6 @@
   "path": "src/typings",
   "bundle": "src/typings/tsd.d.ts",
   "installed": {
-    "aws-sdk/aws-sdk.d.ts": {
-      "commit": "1cdb0112fcab7ad7d85a5feebd9f02dcf3dccc32"
-    },
     "async/async.d.ts": {
       "commit": "1cdb0112fcab7ad7d85a5feebd9f02dcf3dccc32"
     },

@@ -1,8 +1,8 @@
 import {doUntil} from 'async'
-import {kinesis} from 'aws-sdk'
+import {Kinesis} from 'aws-sdk'
 
 export interface ListShardsCallback {
-  (err: any, data?: kinesis.Shard[]): void
+  (err: any, data?: Kinesis.Shard[]): void
 }
 
 export const listShards = (streamProvider, stream: string, callback: ListShardsCallback) => {

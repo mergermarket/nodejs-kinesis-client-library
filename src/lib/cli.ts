@@ -3,7 +3,7 @@ import {join, resolve} from 'path'
 import {spawn} from 'child_process'
 
 import {auto} from 'async'
-import {ClientConfig} from 'aws-sdk'
+import {Config} from 'aws-sdk'
 import {createLogger} from 'bunyan'
 import * as minimist from 'minimist'
 import * as mkdirp from 'mkdirp'
@@ -21,7 +21,7 @@ interface KinesisCliArgs extends minimist.ParsedArgs {
     read?: number
     write?: number
   }
-  aws?: ClientConfig
+  aws?: Config
   http?: (Boolean | number)
   'dynamo-endpoint'?: string
   'local-dynamo'?: Boolean
