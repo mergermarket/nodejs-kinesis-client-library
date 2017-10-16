@@ -15,7 +15,8 @@ import {listShards} from './lib/aws/kinesis'
 import {Lease} from './lib/models/Lease'
 import {Cluster, Capacity as ClusterCapacity} from './lib/models/Cluster'
 import {create as createServer} from './lib/server'
-import streamProvider, {ShardList} from './lib/stream-providers/kinesis-stream-provider'
+import streamProvider from './lib/stream-providers/kinesis-stream-provider'
+import {ShardList} from './lib/stream-providers/stream-provider'
 import {Stream} from './lib/models/Stream'
 
 

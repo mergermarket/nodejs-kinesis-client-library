@@ -6,7 +6,8 @@ import {pluck} from 'underscore'
 import {createKinesisClient} from './lib/aws/factory'
 import config from './lib/config'
 import {Lease} from './lib/models/Lease'
-import streamProvider, {GetRecordsData, RecordList, GetShardIteratorData} from './lib/stream-providers/kinesis-stream-provider'
+import streamProvider from './lib/stream-providers/kinesis-stream-provider'
+import {GetRecordsData, RecordList, GetShardIteratorData} from './lib/stream-providers/stream-provider'
 
 
 interface AbstractConsumerOpts {

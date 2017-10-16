@@ -1,6 +1,6 @@
 import {doUntil} from 'async'
 import {Kinesis} from 'aws-sdk'
-import {DescribeStreamData, ShardList} from '../stream-providers/kinesis-stream-provider'
+import {DescribeStreamData, ShardList} from '../stream-providers/stream-provider'
 
 export interface ListShardsCallback {
   (err: any, data?: ShardList): void
