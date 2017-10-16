@@ -6,7 +6,7 @@ import {pluck} from 'underscore'
 import {createKinesisClient} from './lib/aws/factory'
 import config from './lib/config'
 import {Lease} from './lib/models/Lease'
-import streamProvider from './lib/stream-providers/kinesis-stream-provider'
+import streamProvider, {GetRecordsData, RecordList, GetShardIteratorData} from './lib/stream-providers/kinesis-stream-provider'
 
 
 interface AbstractConsumerOpts {
@@ -64,12 +64,12 @@ export class AbstractConsumer {
   }
 
   // Process a batch of records. This method, or processResponse, must be implemented by the child.
-  public processRecords(records: Kinesis.Record[], callback: ProcessRecordsCallback) {
+  public processRecords(records: RecordList, callback: ProcessRecordsCallback) {
     throw new Error('processRecords must be defined by the consumer class')
   }
 
   // Process raw kinesis response.  Override it to get access to the MillisBehindLatest field.
-  public processResponse(response: Kinesis.GetRecordsOutput, callback: ProcessRecordsCallback) {
+  public processResponse(response: GetRecordsData, callback: ProcessRecordsCallback) {
     this.processRecords(response.Records, callback)
   }
 
@@ -213,7 +213,7 @@ export class AbstractConsumer {
       getRecordsParams = { ShardIterator: this.nextShardIterator, Limit: this.opts.numRecords }
     }
 
-    this.streamProvider.getRecords(getRecordsParams, (err, data) => {
+    this.streamProvider.getRecords(getRecordsParams, (err, data: GetRecordsData) => {
       // Handle known errors
       if (err && err.code === 'ExpiredIteratorException') {
         this.log('Shard iterator expired, updating before next getRecords call')
@@ -262,7 +262,7 @@ export class AbstractConsumer {
   }
 
   // Wrap the child's processResponse method to handle checkpointing.
-  private wrappedProcessResponse(data, callback) {
+  private wrappedProcessResponse(data: GetRecordsData, callback) {
     this.processResponse(data, (err, checkpointSequenceNumber) => {
       if (err) {
         return callback(err)
@@ -304,7 +304,7 @@ export class AbstractConsumer {
       StartingSequenceNumber: sequenceNumber,
     }
 
-    this.streamProvider.getShardIterator(params, (e, data) => {
+    this.streamProvider.getShardIterator(params, (e, data: GetShardIteratorData) => {
       if (e) {
         return callback(e)
       }

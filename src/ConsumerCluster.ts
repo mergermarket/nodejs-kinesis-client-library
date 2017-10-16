@@ -15,7 +15,7 @@ import {listShards} from './lib/aws/kinesis'
 import {Lease} from './lib/models/Lease'
 import {Cluster, Capacity as ClusterCapacity} from './lib/models/Cluster'
 import {create as createServer} from './lib/server'
-import streamProvider from './lib/stream-providers/kinesis-stream-provider'
+import streamProvider, {ShardList} from './lib/stream-providers/kinesis-stream-provider'
 import {Stream} from './lib/models/Stream'
 
 
@@ -250,7 +250,7 @@ export class ConsumerCluster extends EventEmitter {
   private fetchAvailableShard() {
     // Hack around typescript
     var _asyncResults = <{
-      shards: Kinesis.Shard[];
+      shards: ShardList;
       leases: Queries.Query.Result;
     }>{}
 
