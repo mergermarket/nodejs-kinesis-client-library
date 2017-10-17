@@ -17,6 +17,7 @@ import {create as createServer} from './lib/server'
 import streamProvider from './lib/stream-providers/kinesis-stream-provider'
 import {ShardList, DescribeStreamData} from './lib/stream-providers/stream-provider'
 import {Stream} from './lib/models/Stream'
+import createStreamProvider from './lib/stream-providers/stream-provider-factory'
 
 
 interface ClusterWorkerWithOpts extends Worker {
@@ -30,9 +31,11 @@ interface AWSEndpoints {
 
 export interface ConsumerClusterOpts {
   streamName: string
+  streamType: string,
   tableName: string
   awsConfig: Config
   dynamoEndpoint?: string
+  dynamoStreamEndpoint?: string,
   localDynamo: Boolean
   kinesisEndpoint?: string
   localKinesis: Boolean
@@ -62,6 +65,12 @@ export class ConsumerCluster extends EventEmitter {
     super()
     this.opts = opts
 
+    const DEFAULT_STREAM_TYPE = 'kinesis'
+
+    if (!this.opts.streamType) {
+      this.opts.streamType = DEFAULT_STREAM_TYPE
+    }
+
     this.logger = createLogger({
       name: 'KinesisCluster',
       level: opts.logLevel,
@@ -77,8 +86,7 @@ export class ConsumerCluster extends EventEmitter {
       dynamo: this.getDynamoEndpoint(),
     }
 
-    const kinesis = createKinesisClient(this.opts.awsConfig, this.endpoints.kinesis)
-    this.streamProvider = streamProvider(kinesis, this.opts.streamName)
+    this.streamProvider = createStreamProvider(this.opts)
 
     this.cluster = new Cluster(this.opts.tableName, this.opts.awsConfig, this.endpoints.dynamo)
     this.init()
@@ -256,16 +264,6 @@ export class ConsumerCluster extends EventEmitter {
 
     parallel({
       allShardIds: done => {
-        // listShards(this.streamProvider, this.opts.streamName, (err, shards) => {
-        //   if (err) {
-        //     return done(err)
-        //   }
-
-        //   _asyncResults.shards = shards
-        //   done()
-        // })
-
-        // (streamProvider, stream: string, callback: ListShardsCallback) => {
           let shards = []
           let foundAllShards = false
           var startShardId
@@ -390,10 +388,12 @@ export class ConsumerCluster extends EventEmitter {
       tableName: this.opts.tableName,
       awsConfig: this.opts.awsConfig,
       streamName: this.opts.streamName,
+      streamType: this.opts.streamType,
       startingIteratorType: (this.opts.startingIteratorType || '').toUpperCase(),
       shardId: shardId,
       leaseCounter: leaseCounter,
       dynamoEndpoint: this.endpoints.dynamo,
+      dynamoStreamEndpoint: this.opts.dynamoStreamEndpoint,
       kinesisEndpoint: this.endpoints.kinesis,
       numRecords: this.opts.numRecords,
       timeBetweenReads: this.opts.timeBetweenReads,

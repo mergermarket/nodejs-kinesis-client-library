@@ -7,11 +7,12 @@ import {createKinesisClient} from './lib/aws/factory'
 import config from './lib/config'
 import {Lease} from './lib/models/Lease'
 import streamProvider from './lib/stream-providers/kinesis-stream-provider'
-import {GetRecordsData, RecordList, GetShardIteratorData} from './lib/stream-providers/stream-provider'
-
+import {GetRecordsData, RecordList, GetShardIteratorData, StreamProvider} from './lib/stream-providers/stream-provider'
+import createStreamProvider from './lib/stream-providers/stream-provider-factory'
 
 interface AbstractConsumerOpts {
   streamName: string
+  streamType: string
   shardId: string
   leaseCounter?: number
   tableName: string
@@ -40,6 +41,7 @@ export class AbstractConsumer {
   public static ABSTRACT_METHODS = ['processRecords', 'initialize', 'shutdown']
   public static DEFAULT_SHARD_ITERATOR_TYPE = 'TRIM_HORIZON'
   public static DEFAULT_TIME_BETWEEN_READS = 1000
+  public static DEFAULT_STREAM_TYPE = 'kinesis'
   public static ShardIteratorTypes = {
     AT_SEQUENCE_NUMBER: 'AT_SEQUENCE_NUMBER',
     AFTER_SEQUENCE_NUMBER: 'AFTER_SEQUENCE_NUMBER',
@@ -50,12 +52,11 @@ export class AbstractConsumer {
   private opts: AbstractConsumerOpts
   private lease: Lease
   private maxSequenceNumber: string
-  private kinesis: Kinesis
   private nextShardIterator: string
   private hasStartedExit = false
   private timeBetweenReads: number
   private throughputErrorDelay: number
-  private streamProvider
+  private streamProvider: StreamProvider
 
   // Called before record processing starts. This method may be implemented by the child.
   // If it is implemented, the callback must be called for processing to begin.
@@ -90,8 +91,7 @@ export class AbstractConsumer {
       this.opts.startingIteratorType = AbstractConsumer.DEFAULT_SHARD_ITERATOR_TYPE
     }
 
-    this.kinesis = createKinesisClient(this.opts.awsConfig, this.opts.kinesisEndpoint)
-    this.streamProvider = streamProvider(this.kinesis, opts.streamName)
+    this.streamProvider = createStreamProvider(this.opts)
 
     process.on('message', msg => {
       if (msg === config.shutdownMessage) {
@@ -305,7 +305,7 @@ export class AbstractConsumer {
       StartingSequenceNumber: sequenceNumber,
     }
 
-    this.streamProvider.getShardIterator(params, (e, data: GetShardIteratorData) => {
+    this.streamProvider.getShardIterator(params, (e, data) => {
       if (e) {
         return callback(e)
       }

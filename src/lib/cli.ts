@@ -17,6 +17,7 @@ interface KinesisCliArgs extends minimist.ParsedArgs {
   table: string
   stream: string
   'start-at'?: string
+  'stream-type'?: string
   capacity?: {
     read?: number
     write?: number
@@ -24,6 +25,7 @@ interface KinesisCliArgs extends minimist.ParsedArgs {
   aws?: Config
   http?: (Boolean | number)
   'dynamo-endpoint'?: string
+  'dynamo-stream-endpoint'?: string
   'local-dynamo'?: Boolean
   'local-dynamo-directory'?: string
   'kinesis-endpoint'?: string
@@ -50,15 +52,17 @@ if (args.help) {
     Required flags:
     --consumer [Path to consumer file]
     --table [DynamoDB table name]
-    --stream [Kinesis stream name]
+    --stream [Kinesis or dynamo stream name] (depending on --stream-type)]
 
     Optional flags:
+    --stream-type [kinesis|dynamo] (defaults to kinesis)
     --start-at [Starting iterator type] ("trim_horizon" or "latest", defaults to "trim_horizon")
     --capacity.[read|write] [Throughput] (DynamoDB throughput for *new* tables, defaults to 10 for each)
     --aws.[option] [Option value]  (e.g. --aws.region us-west-2)
     --http [port]  (Start HTTP server, port defaults to $PORT)
     --log-level [level] (Logging verbosity, uses Bunyan log levels)
-    --dynamo-endpoint (Use a cusotm endpoint for the DynamoDB service)
+    --dynamo-endpoint (Use a custom endpoint for the DynamoDB service)
+    --dynamo-stream-endpoint (Use a custom endpoint for the DynamoDB service)
     --local-dynamo (Whether or not to use a local implementation of DynamoDB, defaults to false)
     --local-dynamo-directory (Directory to store local DB, defaults to temp directory)
     --kinesis-endpoint (Use a custom endpoint for the Kinesis service)
@@ -76,9 +80,11 @@ const opts = {
   tableName: args.table,
   streamName: args.stream,
   awsConfig: args.aws,
+  streamType: args['stream-type'],
   startingIteratorType: args['start-at'],
   capacity: args.capacity,
   dynamoEndpoint: args['dynamo-endpoint'],
+  dynamoStreamEndpoint: args['dynamo-stream-endpoint'],
   localDynamo: !!args['local-dynamo'],
   kinesisEndpoint: args['kinesis-endpoint'],
   localKinesis: !!args['local-kinesis'],
