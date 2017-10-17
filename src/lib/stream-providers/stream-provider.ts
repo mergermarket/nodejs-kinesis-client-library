@@ -13,18 +13,14 @@ export interface GetRecordsParams {
 export interface GetShardIteratorParams {
   StreamName: string,
   ShardId: string,
-  ShardIteratorType: 'AT_SEQUENCE_NUMBER'|'AFTER_SEQUENCE_NUMBER'|'TRIM_HORIZON'|'LATEST'|'AT_TIMESTAMP',
+  ShardIteratorType: 'AT_SEQUENCE_NUMBER' | 'AFTER_SEQUENCE_NUMBER' | 'TRIM_HORIZON' | 'LATEST' | 'AT_TIMESTAMP',
   StartingSequenceNumber: string,
 }
-
-export type RecordList = Record[];
-
-export type EncryptionType = 'NONE'|'KMS'|string
 
 export interface Record {
   SequenceNumber: string;
   ApproximateArrivalTimestamp?: Date;
-  Data: Kinesis.Data;
+  Data: Data;
   PartitionKey?: string;
   EncryptionType?: EncryptionType;
 }
@@ -53,13 +49,19 @@ export interface StreamDescription {
   Shards: ShardList
 }
 
-export type ShardList = Shard[]
-
 export interface Shard {
   ShardId: string
   ParentShardId?: string
   AdjacentParentShardId?: string;
 }
+
+export type ShardList = Shard[]
+
+export type RecordList = Record[]
+
+export type EncryptionType = 'NONE' | 'KMS' | string
+
+export type Data = Buffer | Uint8Array | Blob | string | Kinesis.Data
 
 export interface StreamProvider {
   createStream(params: CreateStreamParams, callback: (err: any) => void),
