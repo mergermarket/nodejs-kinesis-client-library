@@ -1,7 +1,7 @@
 {
-  "name": "kinesis-client-library",
-  "version": "0.3.6",
-  "description": "Process Kinesis streams and automatically scale up or down as shards split or merge.",
+  "name": "acuris-kinesis-client-library",
+  "version": "0.4.0",
+  "description": "Process Kinesis and DynamoDB streams and automatically scale up or down as shards split or merge.",
   "main": "build/index.js",
   "typings": "build/index",
   "scripts": {
@@ -14,23 +14,27 @@
     "tsd": "npm run tsd-clean && tsd reinstall && tsd rebundle",
     "prepublish": "npm run build"
   },
-  "author": "Evan Solomon",
+  "author": "Acuris",
   "license": "MIT",
   "bin": {
     "launch-kinesis-cluster": "./bin/launch"
   },
-  "homepage": "https://github.com/evansolomon/nodejs-kinesis-client-library",
+  "homepage": "https://github.com/mergermarket/nodejs-kinesis-client-library",
   "repository": {
     "type": "git",
-    "url": "git://github.com/evansolomon/nodejs-kinesis-client-library.git"
+    "url": "git://github.com/mergermarket/nodejs-kinesis-client-library.git"
   },
   "bugs": {
-    "url": "https://github.com/evansolomon/nodejs-kinesis-client-library/issues"
+    "url": "https://github.com/mergermarket/nodejs-kinesis-client-library/issues"
   },
   "keywords": [
     "aws",
-    "kinesis"
+    "kinesis",
+    "dynamodb"
   ],
+  "publishConfig": {
+    "registry": "http://mmrepo.artifactoryonline.com/mmrepo/api/npm/npm-local"
+  },
   "dependencies": {
     "async": "^0.9.0",
     "aws-sdk": "^2.134.0",
