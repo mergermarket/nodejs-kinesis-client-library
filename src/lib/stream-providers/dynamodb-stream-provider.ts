@@ -41,11 +41,15 @@ function toGetRecordsInput(params: GetRecordsParams): DynamoDBStreams.GetRecords
 
 function toGetRecordsOutput(callback: (err: AWSError, data: GetRecordsData) => void) {
   return function (err: AWSError, data: DynamoDBStreams.GetRecordsOutput) {
-    const callbackData: GetRecordsData = {
-      NextShardIterator: data.NextShardIterator,
-      Records: data.Records.map(toRecord)
+    if (err) {
+      callback(err, null)
+    } else {
+      const callbackData: GetRecordsData = {
+        NextShardIterator: data.NextShardIterator,
+        Records: data.Records.map(toRecord)
+      }
+      callback(err, callbackData)
     }
-    callback(err, callbackData)
   }
 }
 
@@ -60,10 +64,14 @@ function toGetShardIteratorInput(params: GetShardIteratorParams): DynamoDBStream
 
 function toGetShardIteratorOutput(callback: (err: AWSError, data: GetShardIteratorData) => void) {
   return function (err: AWSError, data: DynamoDBStreams.GetShardIteratorOutput) {
-    const callbackData: GetShardIteratorData = {
-      ShardIterator: data.ShardIterator
+    if (err) {
+      callback(err, null)
+    } else {
+      const callbackData: GetShardIteratorData = {
+        ShardIterator: data.ShardIterator
+      }
+      callback(err, callbackData)
     }
-    callback(err, callbackData)
   }
 }
 
@@ -77,10 +85,14 @@ function toDescribeStreamInput(params: DescribeStreamParams): DynamoDBStreams.De
 
 function toDescribeStreamOutput(callback: (err: AWSError, data: DescribeStreamData) => void) {
   return function (err: AWSError, data: DynamoDBStreams.DescribeStreamOutput) {
-    const callbackData: DescribeStreamData = {
-      StreamDescription: toStreamDescription(data.StreamDescription)
+    if (err) {
+      callback(err, null)
+    } else {
+      const callbackData: DescribeStreamData = {
+        StreamDescription: toStreamDescription(data.StreamDescription)
+      }
+      callback(err, callbackData)
     }
-    callback(err, callbackData)
   }
 }
 
