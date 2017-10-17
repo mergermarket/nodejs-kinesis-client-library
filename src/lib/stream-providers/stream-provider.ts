@@ -1,4 +1,4 @@
-import { AWSError } from 'aws-sdk'
+import { AWSError, Kinesis } from 'aws-sdk'
 
 export interface CreateStreamParams {
   StreamName: string,
@@ -21,13 +21,11 @@ export type RecordList = Record[];
 
 export type EncryptionType = 'NONE'|'KMS'|string
 
-export type Data = Buffer|Uint8Array|Blob|string
-
 export interface Record {
   SequenceNumber: string;
   ApproximateArrivalTimestamp?: Date;
-  Data: Data;
-  PartitionKey: string;
+  Data: Kinesis.Data;
+  PartitionKey?: string;
   EncryptionType?: EncryptionType;
 }
 
@@ -39,6 +37,7 @@ export interface GetRecordsData {
 export interface DescribeStreamParams {
   StreamName: string;
   ExclusiveStartShardId?: string;
+  Limit?: number
 }
 
 export interface GetShardIteratorData {
