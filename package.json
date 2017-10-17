@@ -30,7 +30,8 @@
   "keywords": [
     "aws",
     "kinesis",
-    "dynamodb"
+    "dynamodb",
+    "dynamodb-streams"
   ],
   "publishConfig": {
     "registry": "http://mmrepo.artifactoryonline.com/mmrepo/api/npm/npm-local"
