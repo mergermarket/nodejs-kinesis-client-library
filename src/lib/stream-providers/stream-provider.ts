@@ -64,7 +64,7 @@ export type EncryptionType = 'NONE' | 'KMS' | string
 export type Data = Buffer | Uint8Array | Blob | string | Kinesis.Data
 
 export interface StreamProvider {
-  createStream(params: CreateStreamParams, callback: (err: any) => void),
+  createStream(params: CreateStreamParams, callback: (err: Error) => void),
   getRecords(params: GetRecordsParams, callback: (err: AWSError, data: GetRecordsData) => void),
   getShardIterator(params: GetShardIteratorParams, callback: (err: AWSError, data: GetShardIteratorData) => void),
   describeStream(params: DescribeStreamParams, callback: (err: AWSError, data: DescribeStreamData) => void)

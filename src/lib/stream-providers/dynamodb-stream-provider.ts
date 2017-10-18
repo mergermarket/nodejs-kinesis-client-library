@@ -44,11 +44,10 @@ function toGetRecordsOutput(callback: (err: AWSError, data: GetRecordsData) => v
     if (err) {
       callback(err, null)
     } else {
-      const callbackData: GetRecordsData = {
+      callback(null, {
         NextShardIterator: data.NextShardIterator,
         Records: data.Records.map(toRecord)
-      }
-      callback(err, callbackData)
+      })
     }
   }
 }
@@ -67,10 +66,9 @@ function toGetShardIteratorOutput(callback: (err: AWSError, data: GetShardIterat
     if (err) {
       callback(err, null)
     } else {
-      const callbackData: GetShardIteratorData = {
+      callback(null, {
         ShardIterator: data.ShardIterator
-      }
-      callback(err, callbackData)
+      })
     }
   }
 }
@@ -88,10 +86,9 @@ function toDescribeStreamOutput(callback: (err: AWSError, data: DescribeStreamDa
     if (err) {
       callback(err, null)
     } else {
-      const callbackData: DescribeStreamData = {
+      callback(null, {
         StreamDescription: toStreamDescription(data.StreamDescription)
-      }
-      callback(err, callbackData)
+      })
     }
   }
 }
