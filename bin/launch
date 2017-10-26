@@ -7,9 +7,15 @@
 var path = require('path')
 var child_process = require('child_process')
 var bunyan = require('bunyan')
+var minimist = require('minimist')
 
-var logger = bunyan.createLogger({name: 'KinesisClusterLauncher'})
 var args = process.argv.slice(2)
+
+var parsedArgs = minimist(args)
+var customLogData = parsedArgs['custom-log-data']
+var customLogDataObject = customLogData ? JSON.parse(customLogData) : {}
+var loggerOptions = Object.assign({}, customLogDataObject, {name: 'KinesisClusterLauncher'})
+var logger = bunyan.createLogger(loggerOptions)
 
 var cliPath = path.resolve(__dirname, '../build/lib/cli')
 

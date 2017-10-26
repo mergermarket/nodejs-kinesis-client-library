@@ -44,7 +44,8 @@ export interface ConsumerClusterOpts {
   startingIteratorType?: string
   logLevel?: string
   numRecords?: number
-  timeBetweenReads?: number
+  timeBetweenReads?: number,
+  customLogData?: string
 }
 
 
@@ -71,10 +72,13 @@ export class ConsumerCluster extends EventEmitter {
       this.opts.streamType = DEFAULT_STREAM_TYPE
     }
 
-    this.logger = createLogger({
+    var customLogDataObject = this.opts.customLogData ? JSON.parse(this.opts.customLogData) : {}
+    var loggerOptions = Object.assign({}, customLogDataObject, {
       name: 'KinesisCluster',
       level: opts.logLevel,
     })
+
+    this.logger = createLogger(loggerOptions)
 
     setupMaster({
       exec: pathToConsumer,
@@ -398,6 +402,7 @@ export class ConsumerCluster extends EventEmitter {
       numRecords: this.opts.numRecords,
       timeBetweenReads: this.opts.timeBetweenReads,
       logLevel: this.opts.logLevel,
+      customLogData: this.opts.customLogData
     }
 
     const env = {

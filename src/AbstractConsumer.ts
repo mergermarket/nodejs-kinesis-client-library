@@ -23,6 +23,7 @@ interface AbstractConsumerOpts {
   logLevel?: string
   numRecords?: number
   timeBetweenReads?: number
+  customLogData?: string
 }
 
 export interface ProcessRecordsCallback {
@@ -99,12 +100,15 @@ export class AbstractConsumer {
       }
     })
 
-    this.logger = createLogger({
+    var customLogDataObject = this.opts.customLogData ? JSON.parse(this.opts.customLogData) : {}
+    var loggerOptions = Object.assign({}, customLogDataObject, {
       name: 'KinesisConsumer',
       level: opts.logLevel,
       streamName: opts.streamName,
       shardId: opts.shardId,
     })
+
+    this.logger = createLogger(loggerOptions)
 
     this.init()
 
@@ -354,10 +358,10 @@ export class AbstractConsumer {
     const opts = JSON.parse(process.env.CONSUMER_INSTANCE_OPTS)
     class Consumer extends AbstractConsumer {
       constructor() {
+        super(opts)
         AbstractConsumer.ABSTRACT_METHODS
           .filter(method => args[method])
           .forEach(method => this[method] = args[method])
-        super(opts)
       }
     }
 

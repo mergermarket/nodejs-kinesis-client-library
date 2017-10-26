@@ -35,13 +35,19 @@ interface KinesisCliArgs extends minimist.ParsedArgs {
   'log-level': string
   'num-records'?: number
   'time-between-reads'?: number
+  'custom-log-data'?: string
 }
 
 const args = <KinesisCliArgs>minimist(process.argv.slice(2))
-const logger = createLogger({
+
+var customLogData = args['custom-log-data']
+var customLogDataObject = customLogData ? JSON.parse(customLogData) : {}
+var loggerOptions = Object.assign({}, customLogDataObject, {
   name: 'KinesisClusterCLI',
   level: args['log-level']
 })
+
+const logger = createLogger(loggerOptions)
 
 if (args.help) {
   console.log(`
@@ -92,6 +98,7 @@ const opts = {
   logLevel: args['log-level'],
   numRecords: args['num-records'],
   timeBetweenReads: args['time-between-reads'],
+  customLogData: args['custom-log-data']
 }
 
 logger.info('Consumer app path:', consumer)

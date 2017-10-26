@@ -17,4 +17,5 @@ fi
   --table PrintRecordsExample \
   --stream "${STREAM_NAME}" \
   --aws.region "${REGION}" \
-  --local-dynamo
+  --local-dynamo \
+  --custom-log-data "{ \"component\": \"my-component\", \"env\": \"local\" }"
