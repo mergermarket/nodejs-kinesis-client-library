@@ -16,6 +16,7 @@ fi
   --consumer child.js \
   --table PrintRecordsExample \
   --stream "${STREAM_NAME}" \
+  --log-level "info" \
   --aws.region "${REGION}" \
   --local-dynamo \
   --custom-log-data "{ \"component\": \"my-component\", \"env\": \"local\" }"

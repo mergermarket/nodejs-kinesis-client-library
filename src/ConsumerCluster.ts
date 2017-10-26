@@ -113,7 +113,7 @@ export class ConsumerCluster extends EventEmitter {
         const awsConfig = this.opts.awsConfig
         const capacity = this.opts.capacity || {}
 
-        this.logger.info({ table: tableName }, 'Creating DynamoDB table')
+        this.logger.trace({ table: tableName }, 'Creating DynamoDB table')
         Cluster.createTable(tableName, awsConfig, capacity, this.getDynamoEndpoint(), done)
       }],
 
@@ -185,7 +185,7 @@ export class ConsumerCluster extends EventEmitter {
 
   // Run an HTTP server. Useful as a health check.
   public serveHttp(port: string | number) {
-    this.logger.debug('Starting HTTP server on port %s', port)
+    this.logger.trace('Starting HTTP server on port %s', port)
     createServer(port, () => this.consumerIds.length)
   }
 
@@ -201,10 +201,10 @@ export class ConsumerCluster extends EventEmitter {
   private updateNetwork() {
     this.garbageCollectClusters()
     if (this.shouldTryToAcquireMoreShards()) {
-      this.logger.debug('Should try to acquire more shards')
+      this.logger.trace('Should try to acquire more shards')
       this.fetchAvailableShard()
     } else if (this.hasTooManyShards()) {
-      this.logger.debug({ consumerIds: this.consumerIds }, 'Have too many shards')
+      this.logger.trace({ consumerIds: this.consumerIds }, 'Have too many shards')
       this.killConsumer(err => {
         if (err) {
           this.logAndEmitError(err)
@@ -342,14 +342,14 @@ export class ConsumerCluster extends EventEmitter {
 
         // skip if parent shard is not finished (split case)
         if (shard.ParentShardId && !(finishedShardIds.indexOf(shard.ParentShardId) >= 0)) {
-          this.logger.info({ ParentShardId: shard.ParentShardId, ShardId: shard.ShardId },
+          this.logger.trace({ ParentShardId: shard.ParentShardId, ShardId: shard.ShardId },
             'Ignoring shard because ParentShardId is not finished')
           return false
         }
 
         // skip if adjacent parent shard is not finished (merge case)
         if (shard.AdjacentParentShardId && !(finishedShardIds.indexOf(shard.AdjacentParentShardId) >= 0)) {
-          this.logger.info({ AdjacentParentShardId: shard.AdjacentParentShardId, ShardId: shard.ShardId },
+          this.logger.trace({ AdjacentParentShardId: shard.AdjacentParentShardId, ShardId: shard.ShardId },
             'Ignoring shard because AdjacentParentShardId is not finished')
           return false
         }
@@ -359,7 +359,7 @@ export class ConsumerCluster extends EventEmitter {
 
       // If there are shards theat have not been leased, pick one
       if (newShards.length > 0) {
-        this.logger.info({ newShards: newShards }, 'Unleased shards available')
+        this.logger.trace({ newShards: newShards }, 'Unleased shards available')
         return this.consumeAvailableShard(newShards[0].ShardId, null)
       }
 
@@ -379,7 +379,7 @@ export class ConsumerCluster extends EventEmitter {
       if (firstExpiredLease) {
         let shardId = firstExpiredLease.get('id')
         let leaseCounter = firstExpiredLease.get('leaseCounter')
-        this.logger.info({ shardId: shardId, leaseCounter: leaseCounter }, 'Found available shard')
+        this.logger.trace({ shardId: shardId, leaseCounter: leaseCounter }, 'Found available shard')
         this.consumeAvailableShard(shardId, leaseCounter);
       }
     })
@@ -387,7 +387,7 @@ export class ConsumerCluster extends EventEmitter {
 
   // Create a new consumer processes.
   private spawn(shardId: string, leaseCounter: number) {
-    this.logger.info({ shardId: shardId, leaseCounter: leaseCounter }, 'Spawning consumer')
+    this.logger.trace({ shardId: shardId, leaseCounter: leaseCounter }, 'Spawning consumer')
     const consumerOpts = {
       tableName: this.opts.tableName,
       awsConfig: this.opts.awsConfig,
@@ -439,7 +439,7 @@ export class ConsumerCluster extends EventEmitter {
 
   // Kill a specific consumer in the cluster.
   private killConsumerById(id: number, callback: (err: any) => void) {
-    this.logger.info({ id: id }, 'Killing consumer')
+    this.logger.trace({ id: id }, 'Killing consumer')
 
     let callbackWasCalled = false
     const wrappedCallback = (err: any) => {
@@ -472,13 +472,13 @@ export class ConsumerCluster extends EventEmitter {
   }
 
   private killAllConsumers(callback: (err: any) => void) {
-    this.logger.info('Killing all consumers')
+    this.logger.trace('Killing all consumers')
     each(this.consumerIds, this.killConsumerById.bind(this), callback)
   }
 
   // Continuously fetch data about the rest of the network.
   private loopFetchExternalNetwork() {
-    this.logger.info('Starting external network fetch loop')
+    this.logger.trace('Starting external network fetch loop')
 
     const fetchThenWait = done => {
       this.fetchExternalNetwork(err => {
@@ -510,7 +510,7 @@ export class ConsumerCluster extends EventEmitter {
         return memo
       }, {})
 
-      this.logger.debug({ externalNetwork: this.externalNetwork }, 'Updated external network')
+      this.logger.trace({ externalNetwork: this.externalNetwork }, 'Updated external network')
       this.updateNetwork()
       callback()
     })
@@ -518,7 +518,7 @@ export class ConsumerCluster extends EventEmitter {
 
   // Continuously publish data about this cluster to the network.
   private loopReportClusterToNetwork() {
-    this.logger.info('Starting report cluster loop')
+    this.logger.trace('Starting report cluster loop')
     const reportThenWait = done => {
       this.reportClusterToNetwork(err => {
         if (err) {
@@ -538,7 +538,7 @@ export class ConsumerCluster extends EventEmitter {
 
   // Publish data about this cluster to the nework.
   private reportClusterToNetwork(callback: (err: any) => void) {
-    this.logger.debug({ consumers: this.consumerIds.length }, 'Rerpoting cluster to network')
+    this.logger.trace({ consumers: this.consumerIds.length }, 'Rerpoting cluster to network')
     this.cluster.reportActiveConsumers(this.consumerIds.length, callback)
   }
 
@@ -556,7 +556,7 @@ export class ConsumerCluster extends EventEmitter {
       }
 
       if (garbageCollectedClusters.length) {
-        this.logger.info('Garbage collected %d clusters', garbageCollectedClusters.length)
+        this.logger.trace('Garbage collected %d clusters', garbageCollectedClusters.length)
       }
     })
   }

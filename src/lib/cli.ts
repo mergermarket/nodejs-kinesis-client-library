@@ -101,7 +101,7 @@ const opts = {
   customLogData: args['custom-log-data']
 }
 
-logger.info('Consumer app path:', consumer)
+logger.trace('Consumer app path:', consumer)
 const clusterOpts = Object.keys(opts).reduce((memo, key) => {
   if (opts[key] !== undefined) {
     memo[key] = opts[key]
@@ -109,7 +109,7 @@ const clusterOpts = Object.keys(opts).reduce((memo, key) => {
 
   return memo
 }, {})
-logger.info({ options: clusterOpts }, 'Cluster options')
+logger.trace({ options: clusterOpts }, 'Cluster options')
 
 auto({
   localDynamo: done => {
@@ -117,14 +117,14 @@ auto({
       return done()
     }
 
-    logger.info('Launching local DynamoDB')
+    logger.trace('Launching local DynamoDB')
 
     let databaseDir = args['local-dynamo-directory']
     if (!databaseDir) {
       databaseDir = join(tmpdir(), 'localdynamo', Date.now().toString())
     }
 
-    logger.info({ directory: databaseDir }, 'Creating directory for Local DynamoDB')
+    logger.trace({ directory: databaseDir }, 'Creating directory for Local DynamoDB')
     try {
       mkdirp.sync(databaseDir)
     } catch (e) {
@@ -201,7 +201,7 @@ auto({
     })
   },
   cluster: ['localDynamo', 'localKinesis', done => {
-    logger.info('Launching cluster')
+    logger.trace('Launching cluster')
     let cluster
     try {
       cluster = new ConsumerCluster(consumer, opts)
@@ -211,7 +211,7 @@ auto({
       process.exit(1)
     }
 
-    logger.info('Spawned cluster %s', cluster.cluster.id)
+    logger.trace('Spawned cluster %s', cluster.cluster.id)
 
     if (args.http) {
       let port
@@ -221,7 +221,7 @@ auto({
         port = process.env.PORT
       }
 
-      logger.info('Spawning HTTP server on port %d', port)
+      logger.trace('Spawning HTTP server on port %d', port)
       cluster.serveHttp(port)
     }
   }]

@@ -145,7 +145,7 @@ export class AbstractConsumer {
   }
 
   public log(...args: any[]) {
-    this.logger.info.apply(this.logger, args)
+    this.logger.trace.apply(this.logger, args)
   }
 
   // Continuously fetch records from the stream.
@@ -200,7 +200,7 @@ export class AbstractConsumer {
 
   // Update the lease in the network database.
   private reserveLease(callback) {
-    this.logger.debug('Reserving lease')
+    this.logger.trace('Reserving lease')
     this.lease.reserve(callback)
   }
 

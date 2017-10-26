@@ -31,9 +31,9 @@ function fork() {
 
   var proc = child_process.fork(cliPath, args)
 
-  logger.info('Forking CLI')
+  logger.trace('Forking CLI')
   proc.on('exit', function (code) {
-    logger.info({exitCode: code}, 'CLI exited, restarting in 5 seconds')
+    logger.trace({exitCode: code}, 'CLI exited, restarting in 5 seconds')
     setTimeout(fork, 5000)
   })
 }
