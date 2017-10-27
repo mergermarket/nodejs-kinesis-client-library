@@ -101,6 +101,9 @@ export class ConsumerCluster extends EventEmitter {
       tableExists: done => {
         const tableName = this.opts.tableName
         const awsConfig = this.opts.awsConfig
+        this.logger.trace('Checking %s table exists', tableName)
+        this.logger.trace('AWSConfig: %s', JSON.stringify(awsConfig))
+        this.logger.trace('this.getDynamoEndpoint(): %s', this.getDynamoEndpoint())
         Cluster.tableExists(tableName, awsConfig, this.getDynamoEndpoint(), done)
       },
 
