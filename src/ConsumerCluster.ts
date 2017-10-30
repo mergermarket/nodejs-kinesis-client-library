@@ -109,6 +109,7 @@ export class ConsumerCluster extends EventEmitter {
 
       createTable: ['tableExists', (done, data) => {
         if (data.tableExists) {
+          this.logger.trace('not creating table')
           return done()
         }
 
@@ -121,10 +122,15 @@ export class ConsumerCluster extends EventEmitter {
       }],
 
       createStream: done => {
+        this.logger.trace('running create stream')
         const streamName = this.opts.streamName
+        this.logger.trace('stream name %s', streamName)
         const streamModel = new Stream(streamName, this.streamProvider)
+        this.logger.trace('streamModel %s', streamModel)
 
         streamModel.exists((err, exists) => {
+          this.logger.trace('streamModel exists result %s', exists)
+          this.logger.trace('streamModel exists err %s', err)
           if (err) {
             return done(err)
           }
@@ -132,6 +138,8 @@ export class ConsumerCluster extends EventEmitter {
           if (exists) {
             return done()
           }
+
+          this.logger.trace('attempting to create the stream')
 
           this.streamProvider.createStream({ StreamName: streamName, ShardCount: 1 }, err => {
             if (err) {
