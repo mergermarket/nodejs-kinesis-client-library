@@ -83,6 +83,7 @@ export class AbstractConsumer {
   }
 
   constructor(opts) {
+    console.log('AbstractConsumer: constructor')
     this.opts = opts
 
     this.timeBetweenReads = opts.timeBetweenReads || AbstractConsumer.DEFAULT_TIME_BETWEEN_READS
@@ -91,6 +92,8 @@ export class AbstractConsumer {
     if (!this.opts.startingIteratorType) {
       this.opts.startingIteratorType = AbstractConsumer.DEFAULT_SHARD_ITERATOR_TYPE
     }
+
+    console.log('AbstractConsumer: Creating stream provider')
 
     this.streamProvider = createStreamProvider(this.opts)
 
@@ -110,6 +113,8 @@ export class AbstractConsumer {
 
     this.logger = createLogger(loggerOptions)
 
+    console.log('AbstractConsumer: Creating logger')
+
     this.init()
 
     if (!this.opts.shardId) {
@@ -118,7 +123,7 @@ export class AbstractConsumer {
   }
 
   private init() {
-    this.logger.trace('AbstractConsumer Init')
+    this.logger.trace('AbstractConsumer: Init')
     this.setupLease()
 
     series([
