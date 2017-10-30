@@ -361,7 +361,9 @@ export class AbstractConsumer {
 
   // Create a child consumer.
   public static extend(args: ConsumerExtension) {
+    console.log('AbstractConsumer: extend')
     const opts = JSON.parse(process.env.CONSUMER_INSTANCE_OPTS)
+    console.log('AbstractConsumer: opts', opts)
     class Consumer extends AbstractConsumer {
       constructor() {
         super(opts)
