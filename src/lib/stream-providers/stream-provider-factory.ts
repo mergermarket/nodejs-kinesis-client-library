@@ -17,7 +17,7 @@ export default function createStreamProvider(opts) : StreamProvider {
 }
 
 function createDynamoDBStreamProvider (opts): StreamProvider {
-  const client = createDynamoDBStreamsClient(opts.awsConfig, opts.dynamoStreamEndpoint)
+  const client = createDynamoDBStreamsClient(opts.awsConfig, opts.dynamoStreamsEndpoint)
   return dynamoDBStreamProviderFactory(client, opts.streamName)
 }
 

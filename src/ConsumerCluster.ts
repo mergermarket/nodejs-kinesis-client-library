@@ -35,7 +35,7 @@ export interface ConsumerClusterOpts {
   tableName: string
   awsConfig: Config
   dynamoEndpoint?: string
-  dynamoStreamEndpoint?: string,
+  dynamoStreamsEndpoint?: string,
   localDynamo: Boolean
   kinesisEndpoint?: string
   localKinesis: Boolean
@@ -408,7 +408,7 @@ export class ConsumerCluster extends EventEmitter {
       shardId: shardId,
       leaseCounter: leaseCounter,
       dynamoEndpoint: this.endpoints.dynamo,
-      dynamoStreamEndpoint: this.opts.dynamoStreamEndpoint,
+      dynamoStreamsEndpoint: this.opts.dynamoStreamsEndpoint,
       kinesisEndpoint: this.endpoints.kinesis,
       numRecords: this.opts.numRecords,
       timeBetweenReads: this.opts.timeBetweenReads,
