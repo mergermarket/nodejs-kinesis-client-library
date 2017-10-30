@@ -351,11 +351,8 @@ export class ConsumerCluster extends EventEmitter {
           return false
         }
 
-        this.logger.trace('shard.ParentShardId', shard.ParentShardId)
-        this.logger.trace('finishedShardIds', finishedShardIds)
-
         // skip if parent shard is not finished (split case)
-        if (shard.ParentShardId && !(finishedShardIds.indexOf(shard.ParentShardId) >= 0)) {
+        if (shard.ParentShardId && shards.some(s => s.ShardId === shard.ParentShardId) && !(finishedShardIds.indexOf(shard.ParentShardId) >= 0)) {
           this.logger.trace({ ParentShardId: shard.ParentShardId, ShardId: shard.ShardId },
             'Ignoring shard because ParentShardId is not finished')
           return false

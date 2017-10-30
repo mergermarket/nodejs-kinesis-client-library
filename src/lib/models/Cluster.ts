@@ -106,15 +106,12 @@ export class Cluster {
   public static tableExists(name: string, conf: Config, dynamoEndpoint: string,
     callback: (err: any, data?: Boolean) => void) {
     const dynamodb = createDynamoClient(conf, dynamoEndpoint)
-    console.log('***** dynamodb', dynamodb)
     createModel(name, dynamodb).describeTable(err => {
       if (err && err.code === 'ResourceNotFoundException') {
         callback(null, false)
       } else if (err) {
-        console.log('***** err', err)
         callback(err)
       } else {
-        console.log('**** Successfully checked table exists')
         callback(null, true)
       }
     })

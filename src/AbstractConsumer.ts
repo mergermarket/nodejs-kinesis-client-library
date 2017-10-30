@@ -83,7 +83,6 @@ export class AbstractConsumer {
   }
 
   constructor(opts) {
-    console.log('AbstractConsumer: constructor')
     this.opts = opts
 
     this.timeBetweenReads = opts.timeBetweenReads || AbstractConsumer.DEFAULT_TIME_BETWEEN_READS
@@ -92,8 +91,6 @@ export class AbstractConsumer {
     if (!this.opts.startingIteratorType) {
       this.opts.startingIteratorType = AbstractConsumer.DEFAULT_SHARD_ITERATOR_TYPE
     }
-
-    console.log('AbstractConsumer: Creating stream provider')
 
     this.streamProvider = createStreamProvider(this.opts)
 
@@ -112,8 +109,6 @@ export class AbstractConsumer {
     })
 
     this.logger = createLogger(loggerOptions)
-
-    console.log('AbstractConsumer: Creating logger')
 
     this.init()
 
@@ -361,9 +356,7 @@ export class AbstractConsumer {
 
   // Create a child consumer.
   public static extend(args: ConsumerExtension) {
-    console.log('AbstractConsumer: extend')
     const opts = JSON.parse(process.env.CONSUMER_INSTANCE_OPTS)
-    console.log('AbstractConsumer: opts', opts)
     class Consumer extends AbstractConsumer {
       constructor() {
         super(opts)
