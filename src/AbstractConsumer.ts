@@ -118,6 +118,7 @@ export class AbstractConsumer {
   }
 
   private init() {
+    this.logger.trace('AbstractConsumer Init')
     this.setupLease()
 
     series([

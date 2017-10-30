@@ -549,7 +549,7 @@ export class ConsumerCluster extends EventEmitter {
 
   // Publish data about this cluster to the nework.
   private reportClusterToNetwork(callback: (err: any) => void) {
-    this.logger.trace({ consumers: this.consumerIds.length }, 'Rerpoting cluster to network')
+    this.logger.trace({ consumers: this.consumerIds.length }, 'Reporting cluster to network')
     this.cluster.reportActiveConsumers(this.consumerIds.length, callback)
   }
 
