@@ -1,6 +1,6 @@
 {
   "name": "acuris-kinesis-client-library",
-  "version": "0.7.9",
+  "version": "0.7.10",
   "description": "Process Kinesis and DynamoDB streams and automatically scale up or down as shards split or merge.",
   "main": "build/index.js",
   "typings": "build/index",
