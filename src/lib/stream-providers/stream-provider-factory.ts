@@ -17,9 +17,6 @@ export default function createStreamProvider(opts) : StreamProvider {
 }
 
 function createDynamoDBStreamProvider (opts): StreamProvider {
-  if (!opts.dynamoStreamEndpoint) {
-    throw new Error('dynamo-stream-endpoint must be set when using dynamo streams')
-  }
   const client = createDynamoDBStreamsClient(opts.awsConfig, opts.dynamoStreamEndpoint)
   return dynamoDBStreamProviderFactory(client, opts.streamName)
 }
