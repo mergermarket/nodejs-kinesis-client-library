@@ -1596,8 +1596,8 @@ supports-color@^2.0.0:
   resolved "http://mmrepo.jfrog.io/mmrepo/api/npm/npm-virtual/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 
 tar-fs@^1.13.0:
-  version "1.16.0"
-  resolved "http://mmrepo.jfrog.io/mmrepo/api/npm/npm-virtual/tar-fs/-/tar-fs-1.16.0.tgz#e877a25acbcc51d8c790da1c57c9cf439817b896"
+  version "1.16.4"
+  resolved "https://registry.yarnpkg.com/tar-fs/-/tar-fs-1.16.4.tgz#d3f0e1edf164b821f086640b1f0596f004021dc8"
   dependencies:
     chownr "^1.0.1"
     mkdirp "^0.5.1"
